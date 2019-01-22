@@ -1,0 +1,30 @@
+
+
+
+# modify configuration 
+
+in make_condorScript.sh
+ - CMSSW_DIR 
+
+
+# Submit jobs
+
+source setup_condor.sh
+
+sh make_condorScript.sh
+
+
+
+################
+# Useful condor script
+################
+
+condor_q 
+ - will display job status
+
+condor_q -ana [your account]
+ - will display more detail about job status.
+ - This is especially useful if your jobs are kept in IDLE state for long. It explains why CONDOR does not start your jobs.
+
+condor_rm 
+ - kill condor job. job ID can be obtained with condor_q (example : "1234.0").

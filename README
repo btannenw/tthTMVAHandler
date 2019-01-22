@@ -1,0 +1,97 @@
+
+
+Installation of external package 
+
+# cubacore and Vegas
+cd ../
+wget http://www.feynarts.de/cuba/Cuba-4.2.tar.gz
+tar xvzf Cuba-4.2.tar.gz 
+cd Cuba-4.2
+./configure 
+make
+cd -
+
+
+
+
+# in the "src" directory,
+
+git clone https://gitlab.cern.ch/ttH/CommonClassifier.git TTH/CommonClassifier
+# -> commit : 543f7819ccc91b1388f85cd77f69fb0e5bcc11ad
+
+git clone https://gitlab.cern.ch/jpata/MEIntegratorStandalone.git TTH/MEIntegratorStandalone --branch v0.4
+#  --> 163407ccfc0eda4dfa656e55dc74a4bb076f982b
+
+cp -R TTH/MEIntegratorStandalone/libs/* ../lib/$SCRAM_ARCH/
+# (Not sure if this is needed)
+
+git clone https://gitlab.cern.ch/kit-cn-cms-public/RecoLikelihoodReconstruction.git TTH/RecoLikelihoodReconstruction --branch master
+#  commit a56b5c72508ed5fc20da7741367698119df0a2a9
+
+cd TTH
+scram b
+cd ../
+
+
+
+
+
+++++
+
+base
+ - base class to read nTuple file.
+
+reader
+ - inherits "base" and provides extra functions/variables for analyzer.
+
+analyzer
+ - get data of the envet from "reader" and perform analyses.
+ - make histograms.
+ - controlled by analyzer.
+ - more than one analyzer can be created (and controlled by "controller").
+
+controller
+ - control of "reader"
+ --- fed files to the "reader"
+ --- setup each event (and repeat the loop).
+ - control of "analyzer" 
+ --- initialize (with the "reader") and let it execute analysis for each event.
+ --- can have more than one "analyzer" which have different configuration/options.
+ 
+main
+ - work as an interface (take options etc)
+ - own one controller.
+
+
+
++++ workflow
+
+[1] "main" receives inputs from user,
+    and accordingly setup one "controller" with configuration
+    such as input/output file path and options of analysis.
+
+[2] "controller" prepare one "reader" and some "analyzer"s.
+    The analyzers can have different configurations. e.g. analyzers see different eta-bin.
+
+[3] "main" lets "controller" to start the analyses.
+     First, "controller" setup the first input file with "reader".
+
+[4] "controller" setups i-th event and let "analyzer"(s) analyze the event.
+    "analyzer" read the event via "reader".
+    "reader" can be implemented so that it provides complex information which can be calculated from the data.
+
+[5] "controller" repeats [4] untill the end of the file.
+    Them setup next file to "reader" and continue [4].
+
+[6] After all the files are read, "controller" let "analyzers" to do post-analysis work.
+
+
++++
+
+Analysis code will be mainly implemented in "analyzer" or "reader".
+
+The calculation of a variable can be implemented on either of them, 
+ but ones which are common for all of the "analyzer" regardless of the configuration
+ should be implemented on "reader"
+ so that the code is not called by multiple times from "analyzer".
+

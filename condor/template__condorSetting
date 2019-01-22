@@ -1,0 +1,16 @@
+universe = vanilla
+Executable = __SCRIPT_TO_RUN__
+request_memory = 1950
+Should_Transfer_Files = YES
+WhenToTransferOutput = ON_EXIT 
+Output = __log_ZZZZZ_$(Cluster)_$(Process).stdout
+Error = __log_ZZZZZ_$(Cluster)_$(Process).stderr
+Log = __log_ZZZZZ_$(Cluster)_$(Process).log
+notify_user = satoshi@FNAL.GOV
+use_x509userproxy = true
+
+# not needed option for the latest condor :
+# x509userproxy = /tmp/x509up_u49129
+
+Arguments = 
+Queue 1
